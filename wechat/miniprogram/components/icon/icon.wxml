@@ -1,0 +1,2 @@
+<!--components/icon/icon.wxml-->
+<image class="icon {{className}}" src="{{iconSrc}}" mode="aspectFit" style="width: {{size}}rpx; height: {{size}}rpx;"></image>

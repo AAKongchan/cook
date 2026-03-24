@@ -1,0 +1,15 @@
+---
+description: 
+alwaysApply: true
+enabled: true
+updatedAt: 2026-03-23T03:04:19.674Z
+provider: 
+---
+
+# 项目介绍
+本项目是一个包含前后端的精品厨房小程序，核心功能是浏览商品，进行下单
+# 项目架构
+admin 系统的后台管理系统，架构为 element-ui+typescript
+wechat 小程序端，使用小程序的原生语言
+#全局规则
+使用 cloudbase 作为后端服务

@@ -1,0 +1,276 @@
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFE4EC 0%, #FFF5F7 30%, #FFFFFF 100%);
+  padding-bottom: 120rpx;
+}
+
+.header-bg {
+  background: linear-gradient(135deg, #FF8FB0 0%, #C084FC 100%);
+  padding: 100rpx 30rpx 120rpx;
+  border-radius: 0 0 100% 100% / 0 0 80rpx 80rpx;
+  position: relative;
+  margin-bottom: -60rpx;
+  z-index: 1;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.logo-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 20rpx;
+}
+
+.logo-icon-custom {
+  width: 72rpx;
+  height: 72rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.logo-emoji {
+  font-size: 72rpx;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.logo-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.star-icon {
+  font-size: 32rpx;
+  margin-left: 8rpx;
+}
+
+.logo-text {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+}
+
+.welcome {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.9);
+  margin-right: 12rpx;
+}
+
+.brand {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.star {
+  font-size: 32rpx;
+  margin-left: 8rpx;
+}
+
+.slogan {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.search-box {
+  background: #FFFFFF;
+  border-radius: 40rpx;
+  padding: 20rpx 32rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.search-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 16rpx;
+  opacity: 0.5;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.search-placeholder {
+  color: #999;
+}
+
+.category-tabs {
+  display: flex;
+  flex-direction: row;
+  padding: 60rpx 30rpx 30rpx;
+  gap: 24rpx;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.category-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 16rpx 32rpx;
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  font-size: 26rpx;
+  color: #666;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.tab-active {
+  background: linear-gradient(90deg, #FF8FB0 0%, #FF6B9D 100%);
+  color: #FFFFFF;
+}
+
+.tab-icon {
+  margin-right: 12rpx;
+  font-size: 28rpx;
+}
+
+.tab-emoji {
+  font-size: 32rpx;
+  margin-right: 8rpx;
+}
+
+.promo-banner {
+  margin: 0 30rpx 30rpx;
+  background: linear-gradient(90deg, #FFF8E7 0%, #FFECD2 100%);
+  border-radius: 24rpx;
+  padding: 30rpx;
+}
+
+.promo-content {
+  display: flex;
+  align-items: center;
+}
+
+.promo-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 60rpx;
+}
+
+.promo-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #FF6B35;
+  margin-bottom: 8rpx;
+}
+
+.promo-desc {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.goods-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24rpx;
+  padding: 0 30rpx;
+}
+
+.goods-item {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 20rpx rgba(255, 107, 157, 0.08);
+}
+
+.goods-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 280rpx;
+}
+
+.goods-image {
+  width: 100%;
+  height: 100%;
+}
+
+.badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+}
+
+.badge-hot {
+  background: #FF4D4F;
+  color: #FFFFFF;
+}
+
+.badge-new {
+  background: #52C41A;
+  color: #FFFFFF;
+}
+
+.goods-info {
+  padding: 20rpx;
+}
+
+.goods-title {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.goods-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goods-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goods-price {
+  font-size: 32rpx;
+  color: #FF6B9D;
+  font-weight: 600;
+}
+
+.add-btn {
+  width: 56rpx;
+  height: 56rpx;
+  background: linear-gradient(135deg, #FF8FB0 0%, #FF6B9D 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-icon {
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: 300;
+}
+
+.bottom-placeholder {
+  height: 40rpx;
+}

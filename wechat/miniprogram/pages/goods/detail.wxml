@@ -1,0 +1,12 @@
+<view class="detail-container">
+  <image class="goods-image" src="{{goods.image}}" mode="aspectFill"/>
+  <view class="goods-content">
+    <text class="goods-name">{{goods.name}}</text>
+    <text class="goods-desc">{{goods.description}}</text>
+    <text class="goods-price">¥{{goods.price}}</text>
+  </view>
+  <view class="action-bar">
+    <button class="btn-cart" bindtap="addToCart">加入购物车</button>
+    <button class="btn-buy" bindtap="buyNow">立即购买</button>
+  </view>
+</view>

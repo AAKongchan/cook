@@ -1,0 +1,113 @@
+.orders-container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF0F5 0%, #FFFFFF 100%);
+  padding-bottom: 40rpx;
+}
+
+.header {
+  background: linear-gradient(135deg, #C084FC 0%, #FF8FB0 100%);
+  padding: 100rpx 30rpx 40rpx;
+  border-radius: 0 0 40rpx 40rpx;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+}
+
+.back {
+  font-size: 48rpx;
+  color: #FFFFFF;
+  margin-right: 20rpx;
+  padding: 0 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.orders-list {
+  padding: 30rpx;
+}
+
+.order-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20rpx;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-no {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}
+
+.order-date {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.order-status {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 22rpx;
+}
+
+.order-status.completed {
+  background: #E8F5E9;
+  color: #52C41A;
+}
+
+.order-status text:first-child {
+  margin-right: 8rpx;
+}
+
+.order-content {
+  border-top: 2rpx solid #F5F5F5;
+  padding-top: 20rpx;
+}
+
+.order-items {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-price {
+  font-size: 32rpx;
+  color: #FF6B9D;
+  font-weight: 600;
+}
+
+.reorder-btn {
+  padding: 12rpx 32rpx;
+  background: linear-gradient(90deg, #FF8FB0 0%, #FF6B9D 100%);
+  border-radius: 28rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
