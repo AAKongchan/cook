@@ -15,6 +15,10 @@ Page({
   },
 
   onShow() {
+    // 更新自定义tabBar选中状态
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 1 })
+    }
     this.loadCartData()
   },
 
@@ -23,15 +27,10 @@ Page({
     this.setData({ cartList })
     this.calculateTotal()
     
-    // 更新TabBar角标
+    // 更新自定义tabBar角标
     const totalCount = cartList.reduce((sum, item) => sum + item.quantity, 0)
-    if (totalCount > 0) {
-      wx.setTabBarBadge({
-        index: 1,
-        text: String(totalCount)
-      })
-    } else {
-      wx.removeTabBarBadge({ index: 1 })
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: totalCount })
     }
   },
 
@@ -83,13 +82,9 @@ Page({
 
   updateTabBarBadge() {
     const totalCount = this.data.cartList.reduce((sum, item) => sum + item.quantity, 0)
-    if (totalCount > 0) {
-      wx.setTabBarBadge({
-        index: 1,
-        text: String(totalCount)
-      })
-    } else {
-      wx.removeTabBarBadge({ index: 1 })
+    // 更新自定义tabBar角标
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: totalCount })
     }
   },
 
@@ -110,7 +105,10 @@ Page({
     // 清空购物车
     this.setData({ cartList: [], selectedCount: 0, totalPrice: 0 })
     wx.setStorageSync('cartList', [])
-    wx.removeTabBarBadge({ index: 1 })
+    // 更新自定义tabBar角标
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: 0 })
+    }
     
     // 显示成功弹窗
     this.setData({ showSuccessModal: true })
@@ -179,7 +177,10 @@ Page({
         if (res.confirm) {
           this.setData({ cartList: [], selectedCount: 0, totalPrice: 0 })
           wx.setStorageSync('cartList', [])
-          wx.removeTabBarBadge({ index: 1 })
+          // 更新自定义tabBar角标
+          if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+            this.getTabBar().setData({ cartCount: 0 })
+          }
           wx.showToast({ title: '已清空', icon: 'success' })
         }
       }

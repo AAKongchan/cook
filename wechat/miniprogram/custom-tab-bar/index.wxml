@@ -1,0 +1,27 @@
+<!-- 自定义 tabBar -->
+<view class="custom-tab-bar">
+  <view class="tab-bar-bg"></view>
+  <view class="tab-bar-list">
+    <view 
+      class="tab-item {{selected === index ? 'active' : ''}}" 
+      wx:for="{{list}}" 
+      wx:key="index"
+      data-path="{{item.pagePath}}"
+      data-index="{{index}}"
+      bindtap="switchTab"
+    >
+      <view class="icon-wrap">
+        <image 
+          class="tab-icon" 
+          src="{{selected === index ? item.iconActive : item.icon}}" 
+          mode="aspectFit"
+        />
+        <!-- 购物车角标 -->
+        <view class="badge" wx:if="{{item.text === '购物车' && cartCount > 0}}">{{cartCount}}</view>
+      </view>
+      <text class="tab-text">{{item.text}}</text>
+    </view>
+  </view>
+  <!-- 底部安全区域 -->
+  <view class="safe-area-bottom"></view>
+</view>

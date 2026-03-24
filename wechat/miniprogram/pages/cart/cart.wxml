@@ -2,80 +2,92 @@
   <!-- 顶部标题 -->
   <view class="header">
     <view class="header-title">
-      <icon name="cart" size="48" color="#FFFFFF" className="cart-icon"/>
+      <view class="header-icon-wrap">
+        <image class="cart-icon" src="/images/icons/icon-cart.svg" style="width: 48rpx; height: 48rpx;"/>
+      </view>
       <text class="title">我的购物车</text>
     </view>
     <text class="subtitle" wx:if="{{cartList.length > 0}}">已选 {{selectedCount}} 件美食</text>
   </view>
 
+  <!-- 滚动内容区域 -->
+  <scroll-view class="scroll-content" scroll-y="true" wx:if="{{cartList.length > 0}}">
+    <!-- 购物车列表 -->
+    <view class="cart-list">
+      <view class="cart-item" wx:for="{{cartList}}" wx:key="id">
+        <image class="goods-img" src="{{item.image}}" mode="aspectFill"/>
+        <view class="goods-info">
+          <view class="goods-main">
+            <view class="goods-text">
+              <text class="goods-name">{{item.name}}</text>
+              <text class="goods-en">{{item.nameEn}}</text>
+            </view>
+            <view class="goods-right">
+              <text class="goods-price">¥{{item.price * item.quantity}}</text>
+              <view class="quantity-control">
+                <view class="btn-minus" bindtap="decrease" data-id="{{item.id}}">-</view>
+                <text class="quantity">{{item.quantity}}</text>
+                <view class="btn-plus" bindtap="increase" data-id="{{item.id}}">+</view>
+              </view>
+            </view>
+          </view>
+        <view class="goods-actions">
+          <view class="action-btn note-action" bindtap="showNoteModal" data-item="{{item}}">
+            <image class="action-icon" src="/images/icons/icon-note.svg" style="width: 28rpx; height: 28rpx; margin-right: 8rpx;"/>
+            <text class="action-text">添加备注</text>
+          </view>
+          <view class="action-btn delete-action" bindtap="deleteItem" data-id="{{item.id}}">
+            <image class="action-icon" src="/images/icons/icon-trash.svg" style="width: 28rpx; height: 28rpx; margin-right: 8rpx;"/>
+            <text class="action-text">删除</text>
+          </view>
+        </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 订单明细 -->
+    <view class="order-summary">
+      <view class="summary-title">
+        <view class="summary-icon-wrap">
+          <image src="/images/icons/icon-clipboard.svg" style="width: 28rpx; height: 28rpx;"/>
+        </view>
+        <text>订单明细</text>
+      </view>
+      <view class="summary-item" wx:for="{{cartList}}" wx:key="id">
+        <text>{{item.name}} x {{item.quantity}}</text>
+        <text class="item-price">¥{{item.price * item.quantity}}</text>
+      </view>
+      <view class="summary-total">
+        <text>合计</text>
+        <text class="total-price">¥{{totalPrice}}</text>
+      </view>
+    </view>
+
+    <!-- 确认下单按钮 -->
+    <view class="submit-bar">
+      <button class="submit-btn" bindtap="submitOrder">
+        <image src="/images/icons/icon-check.svg" style="width: 32rpx; height: 32rpx; margin-right: 12rpx; filter: brightness(0) invert(1);"/>
+        <text>确认下单 · ¥{{totalPrice}}</text>
+      </button>
+      <view class="clear-link" bindtap="clearCart">
+        <image src="/images/icons/icon-trash.svg" style="width: 24rpx; height: 24rpx; margin-right: 8rpx;"/>
+        <text>清空购物车</text>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view class="bottom-safe"></view>
+  </scroll-view>
+
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{cartList.length === 0}}">
-    <text class="empty-icon">🛒</text>
+    <view class="empty-icon-wrap">
+      <image class="empty-icon" src="/images/icons/icon-cart.svg" mode="aspectFit"/>
+    </view>
     <text class="empty-title">购物车空空如也</text>
     <text class="empty-desc">去选一些美味的食物吧～</text>
     <view class="empty-btn" bindtap="goToMenu">去点餐</view>
   </view>
-
-  <!-- 购物车列表 -->
-  <view class="cart-list" wx:if="{{cartList.length > 0}}">
-    <view class="cart-item" wx:for="{{cartList}}" wx:key="id">
-      <image class="goods-img" src="{{item.image}}" mode="aspectFill"/>
-      <view class="goods-info">
-        <view class="goods-main">
-          <view class="goods-text">
-            <text class="goods-name">{{item.name}}</text>
-            <text class="goods-en">{{item.nameEn}}</text>
-          </view>
-          <view class="goods-right">
-            <text class="goods-price">¥{{item.price * item.quantity}}</text>
-            <view class="quantity-control">
-              <view class="btn-minus" bindtap="decrease" data-id="{{item.id}}">-</view>
-              <text class="quantity">{{item.quantity}}</text>
-              <view class="btn-plus" bindtap="increase" data-id="{{item.id}}">+</view>
-            </view>
-          </view>
-        </view>
-        <view class="goods-actions">
-          <view class="action-btn note-action" bindtap="showNoteModal" data-item="{{item}}">
-            <text class="action-icon">📝</text>
-            <text class="action-text">添加备注</text>
-          </view>
-          <view class="action-btn delete-action" bindtap="deleteItem" data-id="{{item.id}}">
-            <text class="action-icon">🗑️</text>
-            <text class="action-text">删除</text>
-          </view>
-        </view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 订单明细 -->
-  <view class="order-summary" wx:if="{{cartList.length > 0}}">
-    <view class="summary-title">
-      <icon name="clipboard" size="32" color="#FF6B9D"/>
-      <text>订单明细</text>
-    </view>
-    <view class="summary-item" wx:for="{{cartList}}" wx:key="id">
-      <text>{{item.name}} x {{item.quantity}}</text>
-      <text class="item-price">¥{{item.price * item.quantity}}</text>
-    </view>
-    <view class="summary-total">
-      <text>合计</text>
-      <text class="total-price">¥{{totalPrice}}</text>
-    </view>
-  </view>
-
-  <!-- 确认下单按钮 -->
-  <view class="submit-bar" wx:if="{{cartList.length > 0}}">
-    <button class="submit-btn" bindtap="submitOrder">
-      <icon name="dinner" size="32" color="#FFFFFF"/>
-      <text>确认下单 · ¥{{totalPrice}}</text>
-    </button>
-    <text class="clear-link" bindtap="clearCart">清空购物车</text>
-  </view>
-
-  <!-- 底部占位 -->
-  <view class="bottom-safe"></view>
 </view>
 
 <!-- 下单成功弹窗 -->
@@ -86,11 +98,11 @@
     <text class="modal-desc">厨师小姐姐正在努力备餐中</text>
     <text class="modal-desc">请耐心等候约 15-20 分钟</text>
     <view class="modal-stars">
-      <icon name="flower" size="40" color="#FFB6C1"/>
-      <icon name="star" size="40" color="#FFD700"/>
-      <icon name="ribbon" size="40" color="#FF69B4"/>
-      <icon name="sparkle" size="40" color="#FFD700"/>
-      <icon name="star" size="40" color="#FFD700"/>
+      <image src="/images/icons/icon-party.svg" style="width: 40rpx; height: 40rpx;"/>
+      <image src="/images/icons/icon-star.svg" style="width: 40rpx; height: 40rpx;"/>
+      <image src="/images/icons/icon-sparkle.svg" style="width: 40rpx; height: 40rpx;"/>
+      <image src="/images/icons/icon-heart.svg" style="width: 40rpx; height: 40rpx;"/>
+      <image src="/images/icons/icon-star.svg" style="width: 40rpx; height: 40rpx;"/>
     </view>
     <button class="modal-btn" bindtap="goHome">
       <text>太好了！回到菜单</text>
@@ -102,7 +114,7 @@
 <view class="note-modal-mask" wx:if="{{showNoteModal}}" bindtap="closeNoteModal">
   <view class="note-modal" catchtap="preventClose">
     <view class="note-modal-header">
-      <text class="note-icon">📝</text>
+      <image class="note-icon" src="/images/icons/icon-note.svg" style="width: 40rpx; height: 40rpx; margin-right: 16rpx;"/>
       <text class="note-title">为「{{selectedItem.name || '商品'}}」添加备注</text>
     </view>
     <textarea 

@@ -10,19 +10,16 @@ Page({
     this.loadGoods()
   },
 
-  onLoad() {
-    this.loadGoods()
-  },
-
   onShow() {
-    // 恢复购物车角标
+    // 更新自定义tabBar选中状态
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 0 })
+    }
+    // 更新购物车角标
     const cartList = wx.getStorageSync('cartList') || []
     const totalCount = cartList.reduce((sum, item) => sum + item.quantity, 0)
-    if (totalCount > 0) {
-      wx.setTabBarBadge({
-        index: 1,
-        text: String(totalCount)
-      })
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: totalCount })
     }
   },
 
@@ -32,15 +29,25 @@ Page({
     this.filterGoods(index, this.data.searchKeyword)
   },
 
-  filterGoods(index) {
-    const categories = ['全部', '主食', '轻食', '甜点', '饮品', '小吃', '素食', '海鲜', '烧烤']
+  filterGoods(index, keyword = '') {
+    const categories = ['全部', '肉菜', '素菜', '汤菜', '炖菜', '凉菜', '沙拉']
     const category = categories[index]
     
-    if (category === '全部') {
-      this.setData({ goodsList: this.data.goodsList })
-    } else {
-      // 根据分类筛选
+    let filteredList = this.data.allGoodsList
+    
+    // 按分类筛选
+    if (category !== '全部') {
+      filteredList = filteredList.filter(item => item.category === category)
     }
+    
+    // 按搜索关键词筛选
+    if (keyword) {
+      filteredList = filteredList.filter(item => 
+        item.name.includes(keyword) || item.description.includes(keyword)
+      )
+    }
+    
+    this.setData({ goodsList: filteredList })
   },
 
   addToCart(e) {
@@ -69,13 +76,10 @@ Page({
     // 保存到本地存储
     wx.setStorageSync('cartList', cartList)
     
-    // 更新TabBar角标
+    // 更新自定义tabBar角标
     const totalCount = cartList.reduce((sum, item) => sum + item.quantity, 0)
-    if (totalCount > 0) {
-      wx.setTabBarBadge({
-        index: 1,
-        text: String(totalCount)
-      })
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: totalCount })
     }
     
     wx.showToast({ title: '已加入购物车', icon: 'success' })
@@ -87,56 +91,130 @@ Page({
   },
 
   loadGoods() {
-    // 30个菜品数据，每个分类至少4个
+    // 默认图 - 马卡龙风格可爱食物图
+    const defaultImage = 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400'
+    
+    // 100个菜品数据：肉菜20个 + 素菜15个 + 汤菜15个 + 炖菜15个 + 凉菜15个 + 沙拉20个
     const allGoods = [
-      // 主食 (4个)
-      { id: 1, name: '奶油蘑菇意面', description: '新鲜松茸配奶油白酱', price: '68', image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400', category: '主食', isHot: true },
-      { id: 2, name: '经典牛肉炒饭', description: '香嫩牛肉粒配蛋炒饭', price: '48', image: 'https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400', category: '主食' },
-      { id: 3, name: '日式豚骨拉面', description: '浓郁骨汤配叉烧', price: '58', image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400', category: '主食', isNew: true },
-      { id: 4, name: '招牌红烧肉饭', description: '肥瘦相间入口即化', price: '52', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '主食' },
-      
-      // 轻食 (4个)
-      { id: 5, name: '精选寿司拼盘', description: '8种新鲜时令鱼生', price: '128', image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400', category: '轻食', isNew: true },
-      { id: 6, name: '凯撒沙拉', description: '新鲜罗马生菜配帕尔马干酪', price: '42', image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400', category: '轻食' },
-      { id: 7, name: '牛油果三明治', description: '全麦面包配新鲜牛油果', price: '38', image: 'https://images.unsplash.com/photo-1540713434306-58505cf1b6fc?w=400', category: '轻食', isHot: true },
-      { id: 8, name: '鲜虾沙拉碗', description: 'Q弹虾仁配时蔬', price: '56', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '轻食' },
-      
-      // 甜点 (4个)
-      { id: 9, name: '梦幻马卡龙塔', description: '6种口味法式马卡龙', price: '68', image: 'https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=400', category: '甜点', isHot: true },
-      { id: 10, name: '舒芙蕾松饼', description: '日式厚松饼配草莓', price: '52', image: 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=400', category: '甜点', isNew: true },
-      { id: 11, name: '提拉米苏', description: '经典意式咖啡蛋糕', price: '45', image: 'https://images.unsplash.com/photo-1571875257727-256c39da42af?w=400', category: '甜点' },
-      { id: 12, name: '抹茶千层', description: '20层手工班戟皮', price: '58', image: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400', category: '甜点' },
-      
-      // 饮品 (4个)
-      { id: 13, name: '鲜榨西瓜汁', description: '现榨无添加', price: '22', image: 'https://images.unsplash.com/photo-158973821 intended?w=400', category: '饮品' },
-      { id: 14, name: '珍珠奶茶', description: '手工熬制黑糖珍珠', price: '18', image: 'https://images.unsplash.com/photo-1558857563-b371033873b8?w=400', category: '饮品', isHot: true },
-      { id: 15, name: '杨枝甘露', description: '芒果西柚椰奶经典', price: '28', image: 'https://images.unsplash.com/photo-1546173159-315724a31696?w=400', category: '饮品', isNew: true },
-      { id: 16, name: '草莓奶昔', description: '新鲜草莓现打', price: '26', image: 'https://images.unsplash.com/photo-1553530979-7ee52a2670c4?w=400', category: '饮品' },
-      
-      // 小吃 (4个)
-      { id: 17, name: '香脆薯条', description: '金黄酥脆配番茄酱', price: '22', image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400', category: '小吃' },
-      { id: 18, name: '奥尔良烤翅', description: '秘制腌料烤制', price: '32', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400', category: '小吃', isHot: true },
-      { id: 19, name: '芝士玉米杯', description: '拉丝芝士配甜玉米', price: '28', image: 'https://images.unsplash.com/photo-1470119693884-47d3a1d1f180?w=400', category: '小吃' },
-      { id: 20, name: '章鱼小丸子', description: '外酥里嫩木鱼花', price: '25', image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400', category: '小吃', isNew: true },
-      
-      // 素食 (4个)
-      { id: 21, name: '素春卷', description: '新鲜蔬菜脆皮卷', price: '18', image: 'https://images.unsplash.com/photo-1540713434306-58505cf1b6fc?w=400', category: '素食' },
-      { id: 22, name: '麻婆豆腐', description: '嫩滑豆腐麻辣鲜香', price: '32', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '素食', isHot: true },
-      { id: 23, name: '清炒时蔬', description: '当季新鲜蔬菜', price: '28', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', category: '素食' },
-      { id: 24, name: '素烧鹅', description: '豆制品仿荤经典', price: '35', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '素食', isNew: true },
-      
-      // 海鲜 (4个)
-      { id: 25, name: '清蒸鲈鱼', description: '鲜嫩原汁原味', price: '88', image: 'https://images.unsplash.com/photo-1534939561126-855b8675edd7?w=400', category: '海鲜', isHot: true },
-      { id: 26, name: '蒜蓉粉丝虾', description: '粉丝吸满虾鲜味', price: '68', image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400', category: '海鲜' },
-      { id: 27, name: '香辣蟹', description: '秘制香辣酱汁', price: '128', image: 'https://images.unsplash.com/photo-1559742811-822873691df8?w=400', category: '海鲜', isNew: true },
-      { id: 28, name: '白灼虾', description: '鲜甜Q弹配蘸料', price: '78', image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400', category: '海鲜' },
-      
-      // 烧烤 (4个)
-      { id: 29, name: '羊肉串', description: '新疆风味烤串', price: '8', image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=400', category: '烧烤', isHot: true },
-      { id: 30, name: '烤鸡翅', description: '皮脆肉嫩多汁', price: '12', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400', category: '烧烤' },
-      { id: 31, name: '烤茄子', description: '蒜香浓郁软糯', price: '15', image: 'https://images.unsplash.com/photo-1594040291048-15a5db47f5e9?w=400', category: '烧烤', isNew: true },
-      { id: 32, name: '烤玉米', description: '甜糯玉米炭火香', price: '10', image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400', category: '烧烤' }
+      // ========== 肉菜 (20个) ==========
+      { id: 1, name: '糖醋排骨', description: '酸甜酥软 adorable~', price: '45', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '肉菜', isHot: true },
+      { id: 2, name: '红烧肉', description: '肥而不腻入口即化', price: '48', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '肉菜' },
+      { id: 3, name: '可乐鸡翅', description: '甜咸适中肉质嫩滑', price: '36', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400', category: '肉菜', isNew: true },
+      { id: 4, name: '宫保鸡丁', description: '花生配鸡肉香辣下饭', price: '32', image: 'https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400', category: '肉菜' },
+      { id: 5, name: '回锅肉', description: '肥而不腻蒜苗飘香', price: '35', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400', category: '肉菜' },
+      { id: 6, name: '鱼香肉丝', description: '酸甜微辣经典川菜', price: '28', image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400', category: '肉菜', isHot: true },
+      { id: 7, name: '东坡肉', description: '入口即化香甜可口', price: '52', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '肉菜' },
+      { id: 8, name: '蜜汁叉烧', description: '甜蜜滋味港式风味', price: '42', image: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=400', category: '肉菜', isNew: true },
+      { id: 9, name: '蒜蓉粉丝虾', description: '蒜香鲜美粉嫩可爱', price: '48', image: 'https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?w=400', category: '肉菜' },
+      { id: 10, name: '糖醋里脊', description: '外酥里嫩酸甜可口', price: '38', image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6f54262?w=400', category: '肉菜', isHot: true },
+      { id: 11, name: '酱牛肉', description: '酱香浓郁肉质紧实', price: '46', image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400', category: '肉菜' },
+      { id: 12, name: '京酱肉丝', description: '酱香浓郁卷入薄饼', price: '35', image: 'https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400', category: '肉菜' },
+      { id: 13, name: '孜然羊肉', description: '孜然香气扑鼻而来', price: '52', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '肉菜', isNew: true },
+      { id: 14, name: '口水鸡', description: '麻辣鲜香鸡肉嫩滑', price: '38', image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400', category: '肉菜' },
+      { id: 15, name: '蒜香骨', description: '蒜香四溢外酥里嫩', price: '44', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '肉菜' },
+      { id: 16, name: '红烧狮子头', description: '肉质鲜嫩汤汁浓郁', price: '40', image: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=400', category: '肉菜', isHot: true },
+      { id: 17, name: '梅菜扣肉', description: '咸香入味肥而不腻', price: '42', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '肉菜' },
+      { id: 18, name: '黑椒牛柳', description: '黑椒香气牛肉鲜嫩', price: '48', image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400', category: '肉菜' },
+      { id: 19, name: '蒜香烤鸡', description: '蒜香烤至金黄酥脆', price: '45', image: 'https://images.unsplash.com/photo-1532550907401-a57141f2eefd?w=400', category: '肉菜', isNew: true },
+      { id: 20, name: '香酥鸭', description: '外酥里嫩香气四溢', price: '50', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400', category: '肉菜' },
+
+      // ========== 素菜 (15个) ==========
+      { id: 21, name: '番茄炒蛋', description: '经典家常菜酸甜可爱', price: '18', image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=400', category: '素菜', isHot: true },
+      { id: 22, name: '麻婆豆腐', description: '麻辣鲜香嫩滑入口', price: '22', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '素菜' },
+      { id: 23, name: '地三鲜', description: '东北经典咸香下饭', price: '22', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '素菜', isNew: true },
+      { id: 24, name: '干煸四季豆', description: '干香微辣口感爽脆', price: '24', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', category: '素菜' },
+      { id: 25, name: '蚝油生菜', description: '清爽脆嫩蚝油提鲜', price: '15', image: 'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=400', category: '素菜', isHot: true },
+      { id: 26, name: '蒜蓉西兰花', description: '清淡健康蒜香提味', price: '18', image: 'https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400', category: '素菜' },
+      { id: 27, name: '红烧茄子', description: '软糯入味酱香浓郁', price: '20', image: 'https://images.unsplash.com/photo-1594040291048-15a5db47f5e9?w=400', category: '素菜', isNew: true },
+      { id: 28, name: '干锅花菜', description: '干香微辣下饭神器', price: '23', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '素菜' },
+      { id: 29, name: '香菇青菜', description: '清新淡雅健康美味', price: '16', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', category: '素菜' },
+      { id: 30, name: '醋溜土豆丝', description: '酸辣爽口开胃下饭', price: '14', image: 'https://images.unsplash.com/photo-1518977676601-b53f82ber696?w=400', category: '素菜', isHot: true },
+      { id: 31, name: '清炒荷兰豆', description: '清脆爽口颜色鲜绿', price: '20', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', category: '素菜' },
+      { id: 32, name: '蒜蓉秋葵', description: '黏糯爽口健康营养', price: '22', image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400', category: '素菜' },
+      { id: 33, name: '干煸杏鲍菇', description: '口感劲道香气四溢', price: '24', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '素菜', isNew: true },
+      { id: 34, name: '家常豆腐', description: '外酥里嫩酱香浓郁', price: '20', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '素菜' },
+      { id: 35, name: '炒时蔬', description: '时令蔬菜清新健康', price: '16', image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400', category: '素菜' },
+
+      // ========== 汤菜 (15个) ==========
+      { id: 36, name: '紫菜蛋花汤', description: '清爽鲜美暖心暖胃', price: '12', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜', isHot: true },
+      { id: 37, name: '番茄蛋汤', description: '酸甜可口家常美味', price: '14', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 38, name: '玉米排骨汤', description: '清甜滋补营养满满', price: '35', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜', isNew: true },
+      { id: 39, name: '冬瓜丸子汤', description: '清淡鲜美丸子Q弹', price: '28', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 40, name: '酸辣汤', description: '酸辣开胃暖心暖胃', price: '16', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 41, name: '鲫鱼豆腐汤', description: '奶白浓郁鲜美无比', price: '32', image: 'https://images.unsplash.com/photo-1626804475297-411d863b5285?w=400', category: '汤菜', isHot: true },
+      { id: 42, name: '虫草花鸡汤', description: '滋补养生鲜美滋补', price: '38', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 43, name: '西湖牛肉羹', description: '滑嫩鲜美口感丰富', price: '26', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜', isNew: true },
+      { id: 44, name: '丝瓜蛋汤', description: '清新淡雅夏日消暑', price: '15', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 45, name: '海带排骨汤', description: '鲜美滋补营养丰富', price: '32', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 46, name: '萝卜牛腩汤', description: '浓郁鲜美牛肉软烂', price: '38', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 47, name: '菌菇汤', description: '菌香四溢鲜美营养', price: '24', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜', isHot: true },
+      { id: 48, name: '菠菜猪肝汤', description: '补血明目营养丰富', price: '28', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+      { id: 49, name: '莲藕排骨汤', description: '清甜粉糯滋补美味', price: '35', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜', isNew: true },
+      { id: 50, name: '老火靓汤', description: '慢火熬制营养精华', price: '42', image: 'https://images.unsplash.com/photo-1547592166-23acbe346499?w=400', category: '汤菜' },
+
+      // ========== 炖菜 (15个) ==========
+      { id: 51, name: '东北乱炖', description: '一锅炖出家的味道', price: '38', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '炖菜', isHot: true },
+      { id: 52, name: '小鸡炖蘑菇', description: '东北经典鲜香入味', price: '45', image: 'https://images.unsplash.com/photo-1532550907401-a57141f2eefd?w=400', category: '炖菜' },
+      { id: 53, name: '番茄炖牛腩', description: '酸甜浓郁牛肉软烂', price: '48', image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400', category: '炖菜', isNew: true },
+      { id: 54, name: '土豆炖牛肉', description: '土豆软糯牛肉鲜香', price: '46', image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400', category: '炖菜' },
+      { id: 55, name: '莲藕炖排骨', description: '莲藕粉糯排骨入味', price: '42', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '炖菜' },
+      { id: 56, name: '萝卜炖羊肉', description: '冬日滋补暖心暖胃', price: '52', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '炖菜', isHot: true },
+      { id: 57, name: '冬瓜炖鸭', description: '清淡解暑夏日首选', price: '40', image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400', category: '炖菜' },
+      { id: 58, name: '黄豆炖猪蹄', description: '胶原蛋白美容养颜', price: '48', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '炖菜', isNew: true },
+      { id: 59, name: '酸菜炖粉条', description: '东北风味酸爽开胃', price: '28', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '炖菜' },
+      { id: 60, name: '红烧蹄髈', description: '酱香浓郁入口即化', price: '55', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '炖菜' },
+      { id: 61, name: '咖喱炖鸡', description: '咖喱浓郁鸡肉鲜嫩', price: '38', image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400', category: '炖菜' },
+      { id: 62, name: '海带炖排骨', description: '海带软糯排骨鲜香', price: '40', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '炖菜', isHot: true },
+      { id: 63, name: '腐竹炖肉', description: '腐竹吸满肉汁美味', price: '35', image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400', category: '炖菜' },
+      { id: 64, name: '白菜炖豆腐', description: '清淡鲜美家常味道', price: '22', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '炖菜', isNew: true },
+      { id: 65, name: '红烧狮子头', description: '大口吃肉超满足', price: '42', image: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=400', category: '炖菜' },
+
+      // ========== 凉菜 (15个) ==========
+      { id: 66, name: '凉拌黄瓜', description: '清爽解腻开胃小菜', price: '12', image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400', category: '凉菜', isHot: true },
+      { id: 67, name: '皮蛋豆腐', description: '嫩滑爽口夏日必备', price: '16', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '凉菜' },
+      { id: 68, name: '凉拌木耳', description: '爽脆可口营养丰富', price: '15', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '凉菜', isNew: true },
+      { id: 69, name: '拍黄瓜', description: '蒜香浓郁清爽解腻', price: '12', image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400', category: '凉菜' },
+      { id: 70, name: '凉拌海带丝', description: '酸辣开胃低卡健康', price: '14', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '凉菜' },
+      { id: 71, name: '口水鸡', description: '麻辣鲜香鸡肉嫩滑', price: '38', image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400', category: '凉菜', isHot: true },
+      { id: 72, name: '蒜泥白肉', description: '蒜香浓郁肥而不腻', price: '35', image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400', category: '凉菜' },
+      { id: 73, name: '凉拌鸡丝', description: '清爽开胃低脂健康', price: '28', image: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=400', category: '凉菜', isNew: true },
+      { id: 74, name: '凉拌三丝', description: '三种蔬菜爽口搭配', price: '15', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '凉菜' },
+      { id: 75, name: '老醋花生', description: '酸甜酥脆下酒神器', price: '16', image: 'https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400', category: '凉菜' },
+      { id: 76, name: '凉拌腐竹', description: '软嫩爽口豆香四溢', price: '18', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '凉菜', isHot: true },
+      { id: 77, name: '凉拌藕片', description: '脆嫩爽口开胃解腻', price: '15', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '凉菜' },
+      { id: 78, name: '凉拌莴笋', description: '清新脆嫩颜色翠绿', price: '14', image: 'https://images.unsplash.com/photo-1449300079323-02e209d9d3a6?w=400', category: '凉菜' },
+      { id: 79, name: '卤味拼盘', description: '多种卤味一次满足', price: '42', image: 'https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=400', category: '凉菜', isNew: true },
+      { id: 80, name: '凉拌蕨根粉', description: 'Q弹爽滑酸辣开胃', price: '18', image: 'https://images.unsplash.com/photo-1603133872878-684f208fb74b?w=400', category: '凉菜' },
+
+      // ========== 沙拉 (20个) ==========
+      { id: 81, name: '水果沙拉', description: '新鲜水果甜蜜缤纷', price: '25', image: 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400', category: '沙拉', isHot: true },
+      { id: 82, name: '蔬菜沙拉', description: '清爽健康低卡美味', price: '22', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '沙拉' },
+      { id: 83, name: '鸡胸肉沙拉', description: '高蛋白健身首选', price: '32', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '沙拉', isNew: true },
+      { id: 84, name: '凯撒沙拉', description: '经典口味浓郁芝士', price: '28', image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400', category: '沙拉' },
+      { id: 85, name: '金枪鱼沙拉', description: '深海蛋白健康美味', price: '35', image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=400', category: '沙拉' },
+      { id: 86, name: '虾仁牛油果沙拉', description: '优质脂肪蛋白满满', price: '38', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '沙拉', isHot: true },
+      { id: 87, name: '藜麦蔬菜沙拉', description: '超级食物营养均衡', price: '30', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '沙拉' },
+      { id: 88, name: '三文鱼沙拉', description: '鲜美三文鱼健康搭配', price: '42', image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400', category: '沙拉', isNew: true },
+      { id: 89, name: '希腊沙拉', description: '地中海风味清爽', price: '26', image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400', category: '沙拉' },
+      { id: 90, name: '玉米沙拉', description: '香甜玉米清新可口', price: '20', image: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=400', category: '沙拉' },
+      { id: 91, name: '土豆泥沙拉', description: '绵密口感奶香浓郁', price: '22', image: 'https://images.unsplash.com/photo-1574484284008-276d33848b66?w=400', category: '沙拉', isHot: true },
+      { id: 92, name: '紫薯沙拉', description: '紫薯香甜颜值超高', price: '24', image: 'https://images.unsplash.com/photo-1517673132405-a56a62b18caf?w=400', category: '沙拉' },
+      { id: 93, name: '鸡蛋沙拉', description: '蛋白满满营养均衡', price: '20', image: 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=400', category: '沙拉' },
+      { id: 94, name: '烤南瓜沙拉', description: '香甜软糯秋日限定', price: '26', image: 'https://images.unsplash.com/photo-1574484284008-276d33848b66?w=400', category: '沙拉', isNew: true },
+      { id: 95, name: '芦笋沙拉', description: '清新爽口春天味道', price: '28', image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400', category: '沙拉' },
+      { id: 96, name: '豆腐沙拉', description: '嫩滑豆腐日式风味', price: '24', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '沙拉' },
+      { id: 97, name: '牛肉沙拉', description: '鲜嫩牛肉高蛋白', price: '38', image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=400', category: '沙拉', isHot: true },
+      { id: 98, name: '芒果虾仁沙拉', description: '热带风情鲜甜可口', price: '35', image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400', category: '沙拉' },
+      { id: 99, name: '彩虹沙拉', description: '七彩蔬菜颜值担当', price: '28', image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400', category: '沙拉' },
+      { id: 100, name: '全麦蔬菜卷', description: '粗粮纤维健康轻食', price: '25', image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400', category: '沙拉', isNew: true }
     ]
+    
+    // 处理没有图片的菜品，使用默认图
+    allGoods.forEach(item => {
+      if (!item.image) {
+        item.image = defaultImage
+      }
+    })
     
     this.setData({ 
       allGoodsList: allGoods,
@@ -148,26 +226,5 @@ Page({
     const keyword = e.detail.value
     this.setData({ searchKeyword: keyword })
     this.filterGoods(this.data.currentTab, keyword)
-  },
-
-  filterGoods(index, keyword = '') {
-    const categories = ['全部', '主食', '轻食', '甜点', '饮品', '小吃', '素食', '海鲜', '烧烤']
-    const category = categories[index]
-    
-    let filteredList = this.data.allGoodsList
-    
-    // 按分类筛选
-    if (category !== '全部') {
-      filteredList = filteredList.filter(item => item.category === category)
-    }
-    
-    // 按搜索关键词筛选
-    if (keyword) {
-      filteredList = filteredList.filter(item => 
-        item.name.includes(keyword) || item.description.includes(keyword)
-      )
-    }
-    
-    this.setData({ goodsList: filteredList })
   }
 })

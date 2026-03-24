@@ -1,98 +1,96 @@
 <view class="home-container">
-  <!-- 顶部渐变背景 -->
-  <view class="header-bg">
-    <!-- Logo 区域 -->
-    <view class="logo-section">
-      <text class="logo-emoji">👩‍🍳</text>
-      <view class="logo-content">
-        <view class="logo-text">
-          <text class="welcome">欢迎来到</text>
-          <text class="brand">精品厨房</text>
-          <text class="star-icon">✨</text>
+  <!-- 顶部固定区域 -->
+  <view class="header-fixed">
+    <!-- 顶部渐变背景 -->
+    <view class="header-bg">
+      <!-- Logo 区域 -->
+      <view class="logo-section">
+        <image class="logo-icon" src="/images/icons/icon-chefhat.svg" style="width: 72rpx; height: 72rpx; margin-right: 20rpx;"/>
+        <view class="logo-content">
+          <view class="logo-text">
+            <text class="welcome">欢迎来到</text>
+            <text class="brand">精品厨房</text>
+            <text class="star-icon">✨</text>
+          </view>
+          <text class="slogan">新鲜美味 · 用心制作 · 每日精选</text>
         </view>
-        <text class="slogan">今日特供 · 新鲜美味 · 用心制作</text>
+      </view>
+      
+      <!-- 搜索框 -->
+      <view class="search-box">
+        <image class="search-icon" src="/images/icons/icon-search.svg" mode="aspectFit"/>
+        <input class="search-input" placeholder="搜索你想吃的..." placeholder-class="search-placeholder" bindinput="onSearchInput" value="{{searchKeyword}}"/>
       </view>
     </view>
-    
-    <!-- 搜索框 -->
-    <view class="search-box">
-      <image class="search-icon" src="/images/icons/search.png" mode="aspectFit"/>
-      <input class="search-input" placeholder="搜索你想吃的..." placeholder-class="search-placeholder" bindinput="onSearchInput" value="{{searchKeyword}}"/>
-    </view>
-  </view>
 
-  <!-- 分类标签 -->
-  <view class="category-tabs">
-    <view class="tab {{currentTab === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
-      <text class="tab-emoji">✨</text>
-      <text>全部</text>
-    </view>
-    <view class="tab {{currentTab === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
-      <text class="tab-emoji">🍜</text>
-      <text>主食</text>
-    </view>
-    <view class="tab {{currentTab === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
-      <text class="tab-emoji">🥗</text>
-      <text>轻食</text>
-    </view>
-    <view class="tab {{currentTab === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
-      <text class="tab-emoji">🍰</text>
-      <text>甜点</text>
-    </view>
-    <view class="tab {{currentTab === 4 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="4">
-      <text class="tab-emoji">🥤</text>
-      <text>饮品</text>
-    </view>
-    <view class="tab {{currentTab === 5 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="5">
-      <text class="tab-emoji">🍟</text>
-      <text>小吃</text>
-    </view>
-    <view class="tab {{currentTab === 6 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="6">
-      <text class="tab-emoji">🥬</text>
-      <text>素食</text>
-    </view>
-    <view class="tab {{currentTab === 7 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="7">
-      <text class="tab-emoji">🦐</text>
-      <text>海鲜</text>
-    </view>
-    <view class="tab {{currentTab === 8 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="8">
-      <text class="tab-emoji">🍖</text>
-      <text>烧烤</text>
-    </view>
-  </view>
-
-  <!-- 限时优惠横幅 -->
-  <view class="promo-banner" wx:if="{{currentTab === 0}}">
-    <view class="promo-content">
-      <icon name="gift" size="80" color="#FF6B9D"/>
-      <view class="promo-text">
-        <text class="promo-title">限时优惠！</text>
-        <text class="promo-desc">今日下单满¥100享9折，满¥200享8折</text>
+    <!-- 分类标签 -->
+    <view class="category-tabs">
+      <view class="tab {{currentTab === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
+        <text class="tab-emoji">✨</text>
+        <text>全部</text>
+      </view>
+      <view class="tab {{currentTab === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
+        <text class="tab-emoji">🥩</text>
+        <text>肉菜</text>
+      </view>
+      <view class="tab {{currentTab === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
+        <text class="tab-emoji">🥬</text>
+        <text>素菜</text>
+      </view>
+      <view class="tab {{currentTab === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
+        <text class="tab-emoji">🍵</text>
+        <text>汤菜</text>
+      </view>
+      <view class="tab {{currentTab === 4 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="4">
+        <text class="tab-emoji">🍲</text>
+        <text>炖菜</text>
+      </view>
+      <view class="tab {{currentTab === 5 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="5">
+        <text class="tab-emoji">🧊</text>
+        <text>凉菜</text>
+      </view>
+      <view class="tab {{currentTab === 6 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="6">
+        <text class="tab-emoji">🥗</text>
+        <text>沙拉</text>
       </view>
     </view>
   </view>
 
-  <!-- 商品列表 -->
-  <view class="goods-list">
-    <view class="goods-item" wx:for="{{goodsList}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
-      <view class="goods-image-wrap">
-        <image class="goods-image" src="{{item.image}}" mode="aspectFill"/>
-        <view class="badge badge-hot" wx:if="{{item.isHot}}">招牌</view>
-        <view class="badge badge-new" wx:if="{{item.isNew}}">新品</view>
+  <!-- 可滚动内容区域 -->
+  <scroll-view class="content-scroll" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <!-- 限时优惠横幅 -->
+    <view class="promo-banner" wx:if="{{currentTab === 0}}">
+      <view class="promo-content">
+        <image class="promo-icon" src="/images/icons/icon-party.svg" style="width: 80rpx; height: 80rpx; margin-right: 30rpx;"/>
+        <view class="promo-text">
+          <text class="promo-title">限时优惠！</text>
+          <text class="promo-desc">满¥100享9折，满¥200享8折</text>
+        </view>
       </view>
-      <view class="goods-info">
-        <text class="goods-title">{{item.name}}</text>
-        <text class="goods-desc">{{item.description}}</text>
-        <view class="goods-price-row">
-          <text class="goods-price">¥{{item.price}}</text>
-          <view class="add-btn" catchtap="addToCart" data-item="{{item}}">
-            <text class="add-icon">+</text>
+    </view>
+
+    <!-- 商品列表 -->
+    <view class="goods-list">
+      <view class="goods-item" wx:for="{{goodsList}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        <view class="goods-image-wrap">
+          <image class="goods-image" src="{{item.image}}" mode="aspectFill"/>
+          <view class="badge badge-hot" wx:if="{{item.isHot}}">招牌</view>
+          <view class="badge badge-new" wx:if="{{item.isNew}}">新品</view>
+        </view>
+        <view class="goods-info">
+          <text class="goods-title">{{item.name}}</text>
+          <text class="goods-desc">{{item.description}}</text>
+          <view class="goods-price-row">
+            <text class="goods-price">¥{{item.price}}</text>
+            <view class="add-btn" catchtap="addToCart" data-item="{{item}}">
+              <text class="add-icon">+</text>
+            </view>
           </view>
         </view>
       </view>
     </view>
-  </view>
 
-  <!-- 底部占位 -->
-  <view class="bottom-placeholder"></view>
+    <!-- 底部占位 -->
+    <view class="bottom-placeholder"></view>
+  </scroll-view>
 </view>

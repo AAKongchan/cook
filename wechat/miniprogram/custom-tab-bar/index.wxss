@@ -1,0 +1,140 @@
+/* 自定义 tabBar 样式 */
+.custom-tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+}
+
+/* tabBar 背景 */
+.tab-bar-bg {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(140rpx + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF0F5 50%, #FFE4EC 100%);
+  border-radius: 40rpx 40rpx 0 0;
+  box-shadow: 0 -4rpx 20rpx rgba(255, 107, 157, 0.1);
+}
+
+/* tabBar 列表容器 */
+.tab-bar-list {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 140rpx;
+  padding: 20rpx 60rpx 0;
+}
+
+/* 单个 tab 项 */
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+/* 图标容器 */
+.icon-wrap {
+  position: relative;
+  width: 110rpx;
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6rpx;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+}
+
+/* 未选中状态 - 无背景 */
+.tab-item .icon-wrap {
+  background: transparent;
+}
+
+/* 选中状态 - 菜单（粉色背景） */
+.tab-item:nth-child(1).active .icon-wrap {
+  background: rgba(255, 107, 157, 0.12);
+}
+
+/* 选中状态 - 购物车（蓝色背景） */
+.tab-item:nth-child(2).active .icon-wrap {
+  background: rgba(74, 144, 217, 0.12);
+}
+
+/* 选中状态 - 我的（紫色背景） */
+.tab-item:nth-child(3).active .icon-wrap {
+  background: rgba(156, 107, 255, 0.12);
+}
+
+/* SVG 图标 - 保持原色，默认更大 */
+.tab-icon {
+  width: 56rpx;
+  height: 56rpx;
+  transition: all 0.3s ease;
+}
+
+/* 选中状态的图标再放大一点 */
+.tab-item.active .tab-icon {
+  transform: scale(1.15);
+}
+
+
+
+/* tab 文字 - 未选中状态（淡灰色） */
+.tab-text {
+  font-size: 26rpx;
+  color: #bbb;
+  transition: all 0.3s ease;
+}
+
+/* 选中状态的文字 - 菜单（粉色） */
+.tab-item:nth-child(1).active .tab-text {
+  color: #FF6B9D;
+  font-weight: 500;
+}
+
+/* 选中状态的文字 - 购物车（蓝色） */
+.tab-item:nth-child(2).active .tab-text {
+  color: #4A90D9;
+  font-weight: 500;
+}
+
+/* 选中状态的文字 - 我的（紫色） */
+.tab-item:nth-child(3).active .tab-text {
+  color: #9C6BFF;
+  font-weight: 500;
+}
+
+/* 购物车角标（粉色） */
+.badge {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  min-width: 38rpx;
+  height: 38rpx;
+  background: linear-gradient(135deg, #FF6B9D 0%, #FF8FB0 100%);
+  border-radius: 19rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10rpx;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 157, 0.4);
+  z-index: 10;
+}
+
+/* 底部安全区域 */
+.safe-area-bottom {
+  height: env(safe-area-inset-bottom);
+  background: linear-gradient(180deg, #FFE4EC 0%, #FFD6E8 100%);
+}
+
+
