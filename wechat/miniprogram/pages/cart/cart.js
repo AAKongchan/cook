@@ -11,6 +11,8 @@ Page({
   },
 
   onLoad() {
+    // 清空购物车数据（解决数据不一致问题）
+    wx.setStorageSync('cartList', [])
     this.loadCartData()
   },
 
@@ -19,16 +21,24 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 })
     }
-    this.loadCartData()
+    // 延迟加载确保数据同步
+    setTimeout(() => {
+      this.loadCartData()
+    }, 100)
   },
 
   loadCartData() {
     const cartList = wx.getStorageSync('cartList') || []
-    this.setData({ cartList })
-    this.calculateTotal()
+    console.log('购物车数据:', cartList)
+    this.setData({ 
+      cartList: cartList || []
+    }, () => {
+      this.calculateTotal()
+    })
     
     // 更新自定义tabBar角标
     const totalCount = cartList.reduce((sum, item) => sum + item.quantity, 0)
+    console.log('购物车数量:', totalCount)
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ cartCount: totalCount })
     }
@@ -102,6 +112,24 @@ Page({
   },
 
   submitOrder() {
+    const { cartList, totalPrice } = this.data
+    
+    // 生成订单数据
+    const orderItems = cartList.map(item => `${item.name} x ${item.quantity}`).join('、')
+    const newOrder = {
+      orderNo: 'ORD' + Date.now(),
+      date: new Date().toISOString().split('T')[0],
+      items: orderItems,
+      totalPrice: totalPrice,
+      status: '已完成',
+      detailList: cartList
+    }
+    
+    // 保存到历史订单
+    let orderHistory = wx.getStorageSync('orderHistory') || []
+    orderHistory.unshift(newOrder)
+    wx.setStorageSync('orderHistory', orderHistory)
+    
     // 清空购物车
     this.setData({ cartList: [], selectedCount: 0, totalPrice: 0 })
     wx.setStorageSync('cartList', [])

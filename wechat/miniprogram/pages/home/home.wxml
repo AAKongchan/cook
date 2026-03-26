@@ -24,35 +24,39 @@
     </view>
 
     <!-- 分类标签 -->
-    <view class="category-tabs">
-      <view class="tab {{currentTab === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
+    <view class="category-section">
+      <!-- 全部按钮固定 -->
+      <view class="tab tab-all {{currentTab === 0 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="0">
         <text class="tab-emoji">✨</text>
         <text>全部</text>
       </view>
-      <view class="tab {{currentTab === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
-        <text class="tab-emoji">🥩</text>
-        <text>肉菜</text>
-      </view>
-      <view class="tab {{currentTab === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
-        <text class="tab-emoji">🥬</text>
-        <text>素菜</text>
-      </view>
-      <view class="tab {{currentTab === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
-        <text class="tab-emoji">🍵</text>
-        <text>汤菜</text>
-      </view>
-      <view class="tab {{currentTab === 4 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="4">
-        <text class="tab-emoji">🍲</text>
-        <text>炖菜</text>
-      </view>
-      <view class="tab {{currentTab === 5 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="5">
-        <text class="tab-emoji">🧊</text>
-        <text>凉菜</text>
-      </view>
-      <view class="tab {{currentTab === 6 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="6">
-        <text class="tab-emoji">🥗</text>
-        <text>沙拉</text>
-      </view>
+      <!-- 其他分类可滑动 -->
+      <scroll-view class="category-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
+        <view class="tab {{currentTab === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
+          <text class="tab-emoji">🥩</text>
+          <text>肉菜</text>
+        </view>
+        <view class="tab {{currentTab === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
+          <text class="tab-emoji">🥬</text>
+          <text>素菜</text>
+        </view>
+        <view class="tab {{currentTab === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
+          <text class="tab-emoji">🍵</text>
+          <text>汤菜</text>
+        </view>
+        <view class="tab {{currentTab === 4 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="4">
+          <text class="tab-emoji">🍲</text>
+          <text>炖菜</text>
+        </view>
+        <view class="tab {{currentTab === 5 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="5">
+          <text class="tab-emoji">🧊</text>
+          <text>凉菜</text>
+        </view>
+        <view class="tab {{currentTab === 6 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="6">
+          <text class="tab-emoji">🥗</text>
+          <text>沙拉</text>
+        </view>
+      </scroll-view>
     </view>
   </view>
 

@@ -120,21 +120,33 @@
   color: #999;
 }
 
-.category-tabs {
+.category-section {
   display: flex;
   flex-direction: row;
+  align-items: center;
   padding: 60rpx 30rpx 20rpx;
-  gap: 24rpx;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
   position: relative;
   z-index: 2;
   background: transparent;
 }
 
-.category-tabs::-webkit-scrollbar {
-  display: none;
+.tab-all {
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+
+.category-scroll {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.category-scroll .tab {
+  display: inline-flex;
+  margin-right: 24rpx;
+}
+
+.category-scroll .tab:last-child {
+  margin-right: 0;
 }
 
 .tab {
