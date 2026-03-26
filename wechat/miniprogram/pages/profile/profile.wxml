@@ -1,47 +1,52 @@
 <view class="profile-container">
-  <!-- 头部背景 -->
-  <view class="header-bg">
-    <view class="user-info">
-      <view class="avatar-wrap">
-        <image class="avatar" src="/images/icons/icon-cat.svg" mode="aspectFill"/>
-        <view class="edit-btn">
-          <image src="/images/icons/icon-settings.svg" style="width: 20rpx; height: 20rpx;"/>
+  <!-- 顶部固定区域 -->
+  <view class="header-fixed">
+    <!-- 头部背景 -->
+    <view class="header-bg">
+      <view class="user-info">
+        <view class="avatar-wrap">
+          <image class="avatar" src="/images/icons/icon-cat.svg" mode="aspectFill"/>
+          <view class="edit-btn">
+            <image src="/images/icons/icon-settings.svg" style="width: 20rpx; height: 20rpx;"/>
+          </view>
+        </view>
+        <view class="user-detail">
+          <view class="name-row">
+            <text class="username">小猫美食家</text>
+            <image src="/images/icons/icon-sparkle.svg" style="width: 28rpx; height: 28rpx;"/>
+          </view>
+          <text class="uid">UID: 86666888</text>
+          <view class="vip-badge">
+            <image src="/images/icons/icon-star.svg" style="width: 20rpx; height: 20rpx; margin-right: 8rpx;"/>
+            <text>金牌会员</text>
+          </view>
         </view>
       </view>
-      <view class="user-detail">
-        <view class="name-row">
-          <text class="username">小猫美食家</text>
-          <image src="/images/icons/icon-sparkle.svg" style="width: 28rpx; height: 28rpx;"/>
-        </view>
-        <text class="uid">UID: 86666888</text>
-        <view class="vip-badge">
-          <image src="/images/icons/icon-star.svg" style="width: 20rpx; height: 20rpx; margin-right: 8rpx;"/>
-          <text>金牌会员</text>
-        </view>
+    </view>
+
+    <!-- 统计数据 -->
+    <view class="stats-card">
+      <view class="stat-item">
+        <image class="stat-icon" src="/images/icons/icon-money.svg" style="width: 40rpx; height: 40rpx;"/>
+        <text class="stat-value price">¥{{stats.totalSpend}}</text>
+        <text class="stat-label">累计消费</text>
+      </view>
+      <view class="stat-item">
+        <image class="stat-icon" src="/images/icons/icon-plate.svg" style="width: 40rpx; height: 40rpx;"/>
+        <text class="stat-value">{{stats.orderCount}}次</text>
+        <text class="stat-label">订单数量</text>
+      </view>
+      <view class="stat-item">
+        <image class="stat-icon" src="/images/icons/icon-star.svg" style="width: 40rpx; height: 40rpx;"/>
+        <text class="stat-value">{{stats.points}}</text>
+        <text class="stat-label">积分余额</text>
       </view>
     </view>
   </view>
 
-  <!-- 统计数据 -->
-  <view class="stats-card">
-    <view class="stat-item">
-      <image class="stat-icon" src="/images/icons/icon-money.svg" style="width: 40rpx; height: 40rpx;"/>
-      <text class="stat-value price">¥1,280</text>
-      <text class="stat-label">累计消费</text>
-    </view>
-    <view class="stat-item">
-      <image class="stat-icon" src="/images/icons/icon-plate.svg" style="width: 40rpx; height: 40rpx;"/>
-      <text class="stat-value">24次</text>
-      <text class="stat-label">订单数量</text>
-    </view>
-    <view class="stat-item">
-      <image class="stat-icon" src="/images/icons/icon-star.svg" style="width: 40rpx; height: 40rpx;"/>
-      <text class="stat-value">1,280</text>
-      <text class="stat-label">积分余额</text>
-    </view>
-  </view>
-
-  <!-- 历史订单 -->
+  <!-- 可滚动内容区域 -->
+  <scroll-view class="content-scroll" scroll-y="true" enhanced="true" show-scrollbar="false">
+    <!-- 历史订单 -->
   <view class="section-card">
     <view class="menu-item" bindtap="toggleOrders">
       <view class="menu-left">
@@ -69,87 +74,49 @@
     </view>
   </view>
 
-  <!-- 菜单列表 -->
-  <view class="menu-list">
-    <view class="menu-item" bindtap="goToCoupons">
+  <!-- 我的收藏 -->
+  <view class="section-card">
+    <view class="menu-item" bindtap="toggleFavorites">
       <view class="menu-left">
-        <view class="icon-wrap" style="background: #FFE4EC;">
-          <image src="/images/icons/icon-gift.svg" style="width: 32rpx; height: 32rpx;"/>
-        </view>
-        <text class="menu-text">我的优惠券</text>
-      </view>
-      <view class="menu-right">
-        <text class="badge-text">3张可用</text>
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
-      </view>
-    </view>
-    <view class="menu-item" bindtap="goToFavorites">
-      <view class="menu-left">
-        <view class="icon-wrap" style="background: #FFF8E7;">
-          <image src="/images/icons/icon-bookmark.svg" style="width: 32rpx; height: 32rpx;"/>
-        </view>
+        <image src="/images/icons/icon-bookmark.svg" style="width: 32rpx; height: 32rpx; margin-right: 12rpx;"/>
         <text class="menu-text">我的收藏</text>
       </view>
       <view class="menu-right">
-        <text class="badge-text">6道菜</text>
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
+        <text class="badge-text">{{favoriteCount}}道菜</text>
+        <image src="/images/icons/icon-chevrondown.svg" class="arrow {{showFavorites ? 'arrow-up' : ''}}" style="width: 32rpx; height: 32rpx;"/>
       </view>
     </view>
-    <view class="menu-item" bindtap="goToAddress">
-      <view class="menu-left">
-        <view class="icon-wrap" style="background: #E8F5E9;">
-          <image src="/images/icons/icon-location.svg" style="width: 32rpx; height: 32rpx;"/>
+    <!-- 展开的收藏列表 -->
+    <view class="favorite-list" wx:if="{{showFavorites}}">
+      <view class="favorite-empty" wx:if="{{favoriteList.length === 0}}">
+        <text>还没有收藏任何菜品哦~</text>
+      </view>
+      <view class="favorite-item" wx:for="{{favoriteList}}" wx:key="id">
+        <image class="favorite-image" src="{{item.image}}" mode="aspectFill"/>
+        <view class="favorite-info">
+          <text class="favorite-name">{{item.name}}</text>
+          <text class="favorite-desc">{{item.description}}</text>
+          <text class="favorite-price">¥{{item.price}}</text>
         </view>
-        <text class="menu-text">收货地址</text>
-      </view>
-      <view class="menu-right">
-        <text class="badge-text">已保存2个</text>
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
-      </view>
-    </view>
-    <view class="menu-item">
-      <view class="menu-left">
-        <view class="icon-wrap" style="background: #E3F2FD;">
-          <image src="/images/icons/icon-bell.svg" style="width: 32rpx; height: 32rpx;"/>
+        <view class="favorite-actions">
+          <view class="favorite-star" bindtap="cancelFavorite" data-id="{{item.id}}">
+            <text class="star-icon">★</text>
+          </view>
+          <view class="add-cart-btn" bindtap="addToCartFromFavorite" data-item="{{item}}">
+            <text>+</text>
+          </view>
         </view>
-        <text class="menu-text">消息通知</text>
-      </view>
-      <view class="menu-right">
-        <text class="badge-text">已开启</text>
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
-      </view>
-    </view>
-    <view class="menu-item">
-      <view class="menu-left">
-        <view class="icon-wrap" style="background: #F3E5F5;">
-          <image src="/images/icons/icon-chat.svg" style="width: 32rpx; height: 32rpx;"/>
-        </view>
-        <text class="menu-text">联系客服</text>
-      </view>
-      <view class="menu-right">
-        <text class="badge-text">在线</text>
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
-      </view>
-    </view>
-    <view class="menu-item">
-      <view class="menu-left">
-        <view class="icon-wrap" style="background: #ECEFF1;">
-          <image src="/images/icons/icon-settings.svg" style="width: 32rpx; height: 32rpx;"/>
-        </view>
-        <text class="menu-text">设置</text>
-      </view>
-      <view class="menu-right">
-        <image src="/images/icons/icon-chevronright.svg" style="width: 32rpx; height: 32rpx;"/>
       </view>
     </view>
   </view>
 
-  <!-- 品牌标语 -->
-  <view class="brand-slogan">
-    <image class="slogan-icon" src="/images/icons/icon-heart.svg" mode="aspectFit"/>
-    <text class="slogan-text">精品厨房 · 用心烹饪每一餐</text>
-  </view>
+    <!-- 品牌标语 -->
+    <view class="brand-slogan">
+      <image class="slogan-icon" src="/images/icons/icon-heart.svg" mode="aspectFit"/>
+      <text class="slogan-text">精品厨房 · 用心烹饪每一餐</text>
+    </view>
 
-  <!-- 底部占位 -->
-  <view class="bottom-safe"></view>
+    <!-- 底部占位 -->
+    <view class="bottom-safe"></view>
+  </scroll-view>
 </view>

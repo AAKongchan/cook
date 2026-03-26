@@ -13,7 +13,7 @@
     "vue-router": "^4.2.4",
     "element-plus": "^2.3.12",
     "@element-plus/icons-vue": "^2.1.0",
-    "@cloudbase/js-sdk": "^1.0.0",
+    "@cloudbase/js-sdk": "^2.0.0",
     "pinia": "^2.1.6"
   },
   "devDependencies": {

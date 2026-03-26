@@ -5,7 +5,15 @@ Page({
       avatarUrl: '/images/icons/usercenter-active.png'
     },
     showOrders: false,
-    orderList: []
+    orderList: [],
+    showFavorites: false,
+    favoriteList: [],
+    favoriteCount: 0,
+    stats: {
+      totalSpend: 0,
+      orderCount: 0,
+      points: 0
+    }
   },
 
   onLoad() {
@@ -22,6 +30,72 @@ Page({
     this.loadOrderHistory()
     // 同步购物车角标
     this.syncCartBadge()
+    // 加载收藏列表
+    this.loadFavorites()
+  },
+
+  // 加载收藏数据
+  loadFavorites() {
+    const favorites = wx.getStorageSync('favorites') || []
+    this.setData({
+      favoriteList: favorites,
+      favoriteCount: favorites.length
+    })
+  },
+
+  // 切换收藏列表显示
+  toggleFavorites() {
+    this.setData({
+      showFavorites: !this.data.showFavorites
+    })
+  },
+
+  // 取消收藏
+  cancelFavorite(e) {
+    const id = e.currentTarget.dataset.id
+    let favorites = wx.getStorageSync('favorites') || []
+    favorites = favorites.filter(item => item.id !== id)
+    wx.setStorageSync('favorites', favorites)
+    this.loadFavorites()
+    wx.showToast({ title: '已取消收藏', icon: 'none' })
+    
+    // 同步更新首页收藏状态
+    const pages = getCurrentPages()
+    const homePage = pages.find(p => p.route === 'pages/home/home')
+    if (homePage && homePage.loadFavorites) {
+      homePage.loadFavorites()
+    }
+  },
+
+  // 从收藏添加到购物车
+  addToCartFromFavorite(e) {
+    const item = e.currentTarget.dataset.item
+    let cartList = wx.getStorageSync('cartList') || []
+    
+    const existingItem = cartList.find(cartItem => cartItem.id === item.id)
+    if (existingItem) {
+      existingItem.quantity += 1
+    } else {
+      cartList.push({
+        id: item.id,
+        name: item.name,
+        price: parseInt(item.price),
+        quantity: 1,
+        image: item.image,
+        nameEn: item.nameEn || item.name,
+        note: ''
+      })
+    }
+    
+    wx.setStorageSync('cartList', cartList)
+    
+    // 更新TabBar角标
+    const totalCount = cartList.reduce((sum, item) => sum + item.quantity, 0)
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ cartCount: totalCount })
+    }
+    
+    wx.showToast({ title: '已加入购物车', icon: 'success' })
   },
 
   syncCartBadge() {
@@ -38,7 +112,25 @@ Page({
 
   loadOrderHistory() {
     const orderHistory = wx.getStorageSync('orderHistory') || []
-    this.setData({ orderList: orderHistory })
+    
+    // 计算统计数据
+    const totalSpend = orderHistory.reduce((sum, order) => sum + (order.totalPrice || 0), 0)
+    const orderCount = orderHistory.length
+    const points = Math.floor(totalSpend / 10) // 10元 = 1积分
+    
+    this.setData({
+      orderList: orderHistory,
+      stats: {
+        totalSpend: this.formatNumber(totalSpend),
+        orderCount: orderCount,
+        points: this.formatNumber(points)
+      }
+    })
+  },
+
+  // 格式化数字，添加千分位
+  formatNumber(num) {
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   },
 
   toggleOrders() {
@@ -100,14 +192,6 @@ Page({
     } else {
       wx.showToast({ title: '该订单无法重新下单', icon: 'none' })
     }
-  },
-
-  goToCoupons() {
-    wx.showToast({ title: '优惠券功能开发中', icon: 'none' })
-  },
-
-  goToFavorites() {
-    wx.showToast({ title: '收藏功能开发中', icon: 'none' })
   },
 
   goToAddress() {

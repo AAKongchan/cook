@@ -138,6 +138,7 @@
 .category-scroll {
   flex: 1;
   white-space: nowrap;
+  padding-right: 30rpx;
 }
 
 .category-scroll .tab {
@@ -145,8 +146,9 @@
   margin-right: 24rpx;
 }
 
-.category-scroll .tab:last-child {
-  margin-right: 0;
+.category-scroll .tab:last-child,
+.category-scroll .tab-last {
+  margin-right: 30rpx;
 }
 
 .tab {
@@ -250,6 +252,33 @@
 .badge-new {
   background: #52C41A;
   color: #FFFFFF;
+}
+
+/* 收藏按钮 */
+.favorite-btn {
+  position: absolute;
+  top: 12rpx;
+  left: 12rpx;
+  width: 64rpx;
+  height: 64rpx;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+}
+
+.favorite-icon {
+  font-size: 36rpx;
+  color: #DDD;
+  transition: all 0.2s ease;
+}
+
+.favorite-active .favorite-icon {
+  color: #FFD700;
+  text-shadow: 0 2rpx 4rpx rgba(255, 215, 0, 0.4);
 }
 
 .goods-info {

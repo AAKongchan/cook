@@ -3,11 +3,14 @@ Page({
     currentTab: 0,
     searchKeyword: '',
     allGoodsList: [],
-    goodsList: []
+    goodsList: [],
+    categories: ['全部', '肉菜', '素菜', '汤菜', '炖菜', '凉菜', '沙拉', '我的收藏']
   },
 
   onLoad() {
+    this.loadCategories()
     this.loadGoods()
+    this.loadFavorites()
   },
 
   onShow() {
@@ -21,6 +24,52 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ cartCount: totalCount })
     }
+    // 刷新收藏状态
+    this.loadFavorites()
+  },
+
+  // 加载收藏数据
+  loadFavorites() {
+    const favorites = wx.getStorageSync('favorites') || []
+    const allGoodsList = this.data.allGoodsList.map(item => ({
+      ...item,
+      isFavorite: favorites.some(fav => fav.id === item.id)
+    }))
+    this.setData({ allGoodsList })
+    this.filterGoods(this.data.currentTab, this.data.searchKeyword)
+  },
+
+  // 切换收藏状态
+  toggleFavorite(e) {
+    const item = e.currentTarget.dataset.item
+    let favorites = wx.getStorageSync('favorites') || []
+    
+    const index = favorites.findIndex(fav => fav.id === item.id)
+    let isFavorite = false
+    
+    if (index > -1) {
+      // 取消收藏
+      favorites.splice(index, 1)
+      wx.showToast({ title: '已取消收藏', icon: 'none' })
+    } else {
+      // 添加收藏
+      favorites.push(item)
+      isFavorite = true
+      wx.showToast({ title: '已收藏', icon: 'success' })
+    }
+    
+    wx.setStorageSync('favorites', favorites)
+    
+    // 更新当前商品列表的收藏状态
+    const allGoodsList = this.data.allGoodsList.map(goods => {
+      if (goods.id === item.id) {
+        return { ...goods, isFavorite }
+      }
+      return goods
+    })
+    
+    this.setData({ allGoodsList })
+    this.filterGoods(this.data.currentTab, this.data.searchKeyword)
   },
 
   switchTab(e) {
@@ -30,13 +79,14 @@ Page({
   },
 
   filterGoods(index, keyword = '') {
-    const categories = ['全部', '肉菜', '素菜', '汤菜', '炖菜', '凉菜', '沙拉']
-    const category = categories[index]
+    const category = this.data.categories[index]
     
     let filteredList = this.data.allGoodsList
     
     // 按分类筛选
-    if (category !== '全部') {
+    if (category === '我的收藏') {
+      filteredList = filteredList.filter(item => item.isFavorite)
+    } else if (category !== '全部') {
       filteredList = filteredList.filter(item => item.category === category)
     }
     
@@ -90,11 +140,70 @@ Page({
     wx.navigateTo({ url: `/pages/goods/detail?id=${id}` })
   },
 
-  loadGoods() {
-    // 默认图 - 马卡龙风格可爱食物图
+  // 从云数据库加载分类
+  async loadCategories() {
+    try {
+      const db = wx.cloud.database()
+      const res = await db.collection('categories')
+        .where({ status: 1 })
+        .orderBy('sort', 'asc')
+        .get()
+      
+      if (res.data.length > 0) {
+        // 按排序获取分类名称，添加"全部"和"我的收藏"
+        const categoryNames = res.data.map(item => item.name)
+        // 过滤掉"全部"（如果有的话），因为我们手动添加
+        const filteredNames = categoryNames.filter(name => name !== '全部')
+        this.setData({
+          categories: ['全部', ...filteredNames, '我的收藏']
+        })
+      }
+    } catch (err) {
+      console.error('加载分类失败:', err)
+      // 使用默认分类
+      this.setData({
+        categories: ['全部', '肉菜', '素菜', '汤菜', '炖菜', '凉菜', '沙拉', '我的收藏']
+      })
+    }
+  },
+
+  // 从云数据库加载商品
+  async loadGoods() {
+    try {
+      const db = wx.cloud.database()
+      const res = await db.collection('goods').limit(1000).get()
+      
+      const allGoods = res.data.map(item => ({
+        ...item,
+        price: String(item.price) // 确保价格是字符串格式
+      }))
+      
+      // 缓存到本地
+      wx.setStorageSync('cachedGoods', allGoods)
+      
+      this.setData({ 
+        allGoodsList: allGoods,
+        goodsList: allGoods 
+      })
+    } catch (err) {
+      console.error('加载商品失败:', err)
+      wx.showToast({ title: '加载商品失败', icon: 'none' })
+      
+      // 如果数据库加载失败，使用本地缓存数据
+      const cachedGoods = wx.getStorageSync('cachedGoods')
+      if (cachedGoods && cachedGoods.length > 0) {
+        this.setData({
+          allGoodsList: cachedGoods,
+          goodsList: cachedGoods
+        })
+      }
+    }
+  },
+  
+  // 本地商品数据（作为备用）
+  loadLocalGoods() {
     const defaultImage = 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400'
     
-    // 100个菜品数据：肉菜20个 + 素菜15个 + 汤菜15个 + 炖菜15个 + 凉菜15个 + 沙拉20个
     const allGoods = [
       // ========== 肉菜 (20个) ==========
       { id: 1, name: '糖醋排骨', description: '酸甜酥软 adorable~', price: '45', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400', category: '肉菜', isHot: true },
@@ -220,6 +329,9 @@ Page({
       allGoodsList: allGoods,
       goodsList: allGoods 
     })
+    
+    // 缓存到本地
+    wx.setStorageSync('cachedGoods', allGoods)
   },
 
   onSearchInput(e) {

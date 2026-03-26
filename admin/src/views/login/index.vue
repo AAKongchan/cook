@@ -1,118 +1,154 @@
 <template>
   <div class="login-container">
-    <div class="login-box">
-      <h2 class="title">精品厨房后台管理系统</h2>
-      <el-form :model="loginForm" :rules="rules" ref="formRef" class="login-form">
-        <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            placeholder="用户名"
-            prefix-icon="User"
-          />
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            type="password"
-            placeholder="密码"
-            prefix-icon="Lock"
-            @keyup.enter="handleLogin"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            :loading="loading"
-            @click="handleLogin"
-            class="login-btn"
-          >
-            登录
-          </el-button>
-        </el-form-item>
-      </el-form>
-    </div>
+    <el-card class="login-card">
+      <template #header>
+        <div class="login-header">
+          <h2>精品厨房后台管理</h2>
+          <p>请使用云开发匿名登录</p>
+        </div>
+      </template>
+      
+      <div class="login-content">
+        <el-alert
+          v-if="showError"
+          :title="errorMessage"
+          type="error"
+          :closable="false"
+          show-icon
+          style="margin-bottom: 20px;"
+        />
+        
+        <el-steps :active="activeStep" finish-status="success" direction="vertical">
+          <el-step title="开启匿名登录">
+            <template #description>
+              <div class="step-desc">
+                <p>1. 打开 <a href="https://tcb.cloud.tencent.com/dev" target="_blank">云开发控制台</a></p>
+                <p>2. 进入「身份认证」→「登录管理」</p>
+                <p>3. 启用「匿名登录」</p>
+                <el-image 
+                  src="https://docs.cloudbase.net/assets/img/anonymous-login.7e5c8c7e.png" 
+                  style="width: 100%; max-width: 400px; margin-top: 10px;"
+                  :preview-src-list="['https://docs.cloudbase.net/assets/img/anonymous-login.7e5c8c7e.png']"
+                />
+              </div>
+            </template>
+          </el-step>
+          
+          <el-step title="配置数据库权限">
+            <template #description>
+              <div class="step-desc">
+                <p>1. 进入「数据库」</p>
+                <p>2. 创建集合：categories、goods</p>
+                <p>3. 设置权限为「所有用户可读，仅创建者可写」</p>
+              </div>
+            </template>
+          </el-step>
+          
+          <el-step title="登录系统">
+            <template #description>
+              <div class="step-desc">
+                <el-button 
+                  type="primary" 
+                  size="large" 
+                  @click="handleLogin"
+                  :loading="loading"
+                  style="margin-top: 10px;"
+                >
+                  立即登录
+                </el-button>
+              </div>
+            </template>
+          </el-step>
+        </el-steps>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
-import { useUserStore } from '@/store/user'
+import { anonymousLogin } from '@/utils/cloudbase'
 
 const router = useRouter()
-const userStore = useUserStore()
-const formRef = ref<FormInstance>()
 const loading = ref(false)
-
-const loginForm = reactive({
-  username: '',
-  password: ''
-})
-
-const rules: FormRules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
-}
+const showError = ref(false)
+const errorMessage = ref('')
+const activeStep = ref(2)
 
 const handleLogin = async () => {
-  if (!formRef.value) return
+  loading.value = true
+  showError.value = false
   
-  await formRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        // TODO: 调用实际的登录接口
-        // 模拟登录
-        setTimeout(() => {
-          userStore.setToken('mock-token')
-          ElMessage.success('登录成功')
-          router.push('/')
-          loading.value = false
-        }, 1000)
-      } catch (error) {
-        ElMessage.error('登录失败')
-        loading.value = false
-      }
+  try {
+    await anonymousLogin()
+    ElMessage.success('登录成功')
+    router.push('/dashboard')
+  } catch (error: any) {
+    console.error('登录失败:', error)
+    showError.value = true
+    
+    if (error.message && error.message.includes('ACCESS_TOKEN_DISABLED')) {
+      errorMessage.value = '匿名登录未开启，请按照上方步骤开启匿名登录功能'
+      activeStep.value = 0
+    } else {
+      errorMessage.value = '登录失败：' + error.message
     }
-  })
+  } finally {
+    loading.value = false
+  }
 }
 </script>
 
 <style scoped>
 .login-container {
-  width: 100%;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
 }
 
-.login-box {
-  width: 400px;
-  padding: 40px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+.login-card {
+  width: 100%;
+  max-width: 600px;
 }
 
-.title {
+.login-header {
   text-align: center;
-  margin-bottom: 30px;
+}
+
+.login-header h2 {
+  margin: 0 0 10px 0;
   color: #333;
-  font-size: 24px;
-  font-weight: 600;
 }
 
-.login-form {
-  width: 100%;
+.login-header p {
+  margin: 0;
+  color: #666;
 }
 
-.login-btn {
-  width: 100%;
-  height: 40px;
-  font-size: 16px;
+.login-content {
+  padding: 20px 0;
+}
+
+.step-desc {
+  padding: 10px 0;
+}
+
+.step-desc p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.step-desc a {
+  color: #409eff;
+  text-decoration: none;
+}
+
+.step-desc a:hover {
+  text-decoration: underline;
 }
 </style>

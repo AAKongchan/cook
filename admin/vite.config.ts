@@ -13,7 +13,13 @@ export default defineConfig({
   base: './', // 使用相对路径，适配静态托管部署
   server: {
     port: 3000,
-    open: true
+    open: true,
+    // 禁用缓存
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    }
   },
   build: {
     outDir: 'dist',

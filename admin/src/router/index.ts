@@ -22,20 +22,20 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: '/product',
+    path: '/menu',
     component: Layout,
-    redirect: '/product/list',
-    meta: { title: '商品管理', icon: 'Goods' },
+    redirect: '/menu/list',
+    meta: { title: '菜单管理', icon: 'Food' },
     children: [
       {
         path: 'list',
-        name: 'ProductList',
+        name: 'MenuList',
         component: () => import('@/views/product/list.vue'),
-        meta: { title: '商品列表', icon: 'List' }
+        meta: { title: '菜品列表', icon: 'List' }
       },
       {
         path: 'category',
-        name: 'ProductCategory',
+        name: 'MenuCategory',
         component: () => import('@/views/product/category.vue'),
         meta: { title: '分类管理', icon: 'Grid' }
       }
@@ -81,17 +81,27 @@ const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   // 设置页面标题
   document.title = (to.meta.title as string) || '精品厨房后台'
   
-  // TODO: 添加登录验证逻辑
-  const token = localStorage.getItem('token')
-  if (to.path !== '/login' && !token) {
-    next('/login')
-  } else {
-    next()
+  // 检查登录状态
+  if (to.path !== '/login') {
+    try {
+      const { checkLogin } = await import('@/utils/cloudbase')
+      const loginState = await checkLogin()
+      if (!loginState) {
+        next('/login')
+        return
+      }
+    } catch (err) {
+      console.error('检查登录状态失败:', err)
+      next('/login')
+      return
+    }
   }
+  
+  next()
 })
 
 export default router

@@ -32,29 +32,28 @@
       </view>
       <!-- 其他分类可滑动 -->
       <scroll-view class="category-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
-        <view class="tab {{currentTab === 1 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="1">
-          <text class="tab-emoji">🥩</text>
-          <text>肉菜</text>
+        <view 
+          class="tab {{currentTab === index + 1 ? 'tab-active' : ''}} {{index === categories.length - 2 ? 'tab-last' : ''}}" 
+          wx:for="{{categories}}" 
+          wx:key="*this"
+          wx:if="{{index > 0 && index < categories.length - 1}}"
+          bindtap="switchTab" 
+          data-index="{{index + 1}}"
+        >
+          <text class="tab-emoji">
+            <text wx:if="{{item === '肉菜'}}">🥩</text>
+            <text wx:if="{{item === '素菜'}}">🥬</text>
+            <text wx:if="{{item === '汤菜'}}">🍵</text>
+            <text wx:if="{{item === '炖菜'}}">🍲</text>
+            <text wx:if="{{item === '凉菜'}}">🧊</text>
+            <text wx:if="{{item === '沙拉'}}">🥗</text>
+          </text>
+          <text>{{item}}</text>
         </view>
-        <view class="tab {{currentTab === 2 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="2">
-          <text class="tab-emoji">🥬</text>
-          <text>素菜</text>
-        </view>
-        <view class="tab {{currentTab === 3 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="3">
-          <text class="tab-emoji">🍵</text>
-          <text>汤菜</text>
-        </view>
-        <view class="tab {{currentTab === 4 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="4">
-          <text class="tab-emoji">🍲</text>
-          <text>炖菜</text>
-        </view>
-        <view class="tab {{currentTab === 5 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="5">
-          <text class="tab-emoji">🧊</text>
-          <text>凉菜</text>
-        </view>
-        <view class="tab {{currentTab === 6 ? 'tab-active' : ''}}" bindtap="switchTab" data-index="6">
-          <text class="tab-emoji">🥗</text>
-          <text>沙拉</text>
+        <!-- 我的收藏 -->
+        <view class="tab {{currentTab === categories.length - 1 ? 'tab-active' : ''}} tab-last" bindtap="switchTab" data-index="{{categories.length - 1}}">
+          <text class="tab-emoji">⭐</text>
+          <text>我的收藏</text>
         </view>
       </scroll-view>
     </view>
@@ -80,6 +79,9 @@
           <image class="goods-image" src="{{item.image}}" mode="aspectFill"/>
           <view class="badge badge-hot" wx:if="{{item.isHot}}">招牌</view>
           <view class="badge badge-new" wx:if="{{item.isNew}}">新品</view>
+          <view class="favorite-btn {{item.isFavorite ? 'favorite-active' : ''}}" catchtap="toggleFavorite" data-item="{{item}}">
+            <text class="favorite-icon">{{item.isFavorite ? '★' : '☆'}}</text>
+          </view>
         </view>
         <view class="goods-info">
           <text class="goods-title">{{item.name}}</text>

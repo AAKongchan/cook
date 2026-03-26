@@ -1,57 +1,64 @@
 import cloudbase from '@cloudbase/js-sdk'
 
-// CloudBase 环境ID - 从小程序端获取
-const ENV_ID = 'cloud1-8g1vupme57ee1bac'
+// 检查 SDK 版本
+console.log('CloudBase SDK 版本:', cloudbase.VERSION)
 
-let app: any = null
-let auth: any = null
-let db: any = null
+// 初始化云开发
+const app = cloudbase.init({
+  env: 'cloud1-8g1vupme57ee1bac', // 小程序环境ID
+  // 添加版本控制，避免缓存问题
+  appVersion: '2.0.0'
+})
 
-export const initCloudBase = async () => {
-  try {
-    app = cloudbase.init({
-      env: ENV_ID
-    })
-    
-    auth = app.auth()
-    db = app.database()
-    
-    console.log('CloudBase 初始化成功')
-    return app
-  } catch (error) {
-    console.error('CloudBase 初始化失败:', error)
-    throw error
-  }
+// 获取数据库实例
+export const db = app.database()
+
+// 获取云函数实例
+export const callFunction = (name: string, data?: any) => {
+  return app.callFunction({
+    name,
+    data
+  })
 }
 
-export const getApp = () => app
-export const getAuth = () => auth
-export const getDb = () => db
+// 初始化云开发（兼容旧代码）
+export const initCloudBase = async () => {
+  // 云开发已经初始化，这里只做占位
+  console.log('CloudBase initialized')
+}
 
-// 调用云函数
-export const callFunction = async (name: string, data: any = {}) => {
-  if (!app) {
-    throw new Error('CloudBase 未初始化')
+// 检查登录状态
+export const checkLogin = async () => {
+  const auth = app.auth({ persistence: 'local' })
+  const loginState = await auth.getLoginState()
+  return loginState
+}
+
+// 匿名登录
+export const anonymousLogin = async () => {
+  const auth = app.auth({ persistence: 'local' })
+  
+  // 检查当前登录状态
+  const loginState = await auth.getLoginState()
+  if (loginState) {
+    console.log('已登录，跳过匿名登录')
+    return
   }
   
+  // 执行匿名登录
   try {
-    const result = await app.callFunction({
-      name,
-      data
-    })
-    return result.result
-  } catch (error) {
-    console.error(`调用云函数 ${name} 失败:`, error)
-    throw error
+    await auth.anonymousAuthProvider().signIn()
+    console.log('匿名登录成功')
+  } catch (err: any) {
+    console.error('匿名登录失败:', err)
+    // 如果匿名登录失败，尝试使用自定义登录（空ticket）
+    if (err.message && err.message.includes('ACCESS_TOKEN_DISABLED')) {
+      console.log('匿名登录被禁用，尝试无认证访问...')
+      // 返回但不抛出错误，让数据库操作尝试使用默认权限
+      return
+    }
+    throw err
   }
 }
 
-// 数据库操作封装
-export const db = {
-  collection: (name: string) => {
-    if (!getDb()) {
-      throw new Error('CloudBase 未初始化')
-    }
-    return getDb().collection(name)
-  }
-}
+export default app

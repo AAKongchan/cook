@@ -1,0 +1,39 @@
+<view class="admin-container">
+  <view class="header">
+    <text class="title">数据管理</text>
+    <text class="subtitle">云开发数据库初始化</text>
+  </view>
+
+  <view class="card">
+    <view class="card-title">数据初始化</view>
+    <view class="btn-group">
+      <button class="btn btn-primary" bindtap="initGoods" loading="{{loading}}">
+        初始化商品数据
+      </button>
+      <button class="btn btn-secondary" bindtap="loadGoodsFromDB" loading="{{loading}}">
+        从数据库加载商品
+      </button>
+      <button class="btn btn-danger" bindtap="clearAll" loading="{{loading}}">
+        清空所有数据
+      </button>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{result}}">
+    <view class="card-title">操作结果</view>
+    <view class="result {{result.success ? 'success' : 'error'}}">
+      <text class="result-icon">{{result.success ? '✓' : '✗'}}</text>
+      <text class="result-text">{{result.message}}</text>
+    </view>
+    <view class="result-detail" wx:if="{{result.count !== undefined}}">
+      数据条数: {{result.count}}
+    </view>
+  </view>
+
+  <view class="tips">
+    <view class="tips-title">使用说明:</view>
+    <view class="tips-item">1. 点击"初始化商品数据"将100个菜品写入云数据库</view>
+    <view class="tips-item">2. 商品数据包含：肉菜、素菜、汤菜、炖菜、凉菜、沙拉</view>
+    <view class="tips-item">3. 首次使用需要部署云函数 initData</view>
+  </view>
+</view>
